@@ -1,1 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Mod Converter | 魔法の変換エンジン</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+        header { text-align: center; margin-bottom: 40px; }
+        .hero-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .upload-zone {
+            border: 2px dashed #475569;
+            padding: 60px 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .upload-zone:hover { border-color: var(--primary); background: #334155; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .feature-card {
+            background: var(--card);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { transform: translateY(-2px); opacity: 0.9; }
+        
+        #progress-bar {
+            width: 100%; height: 8px; background: #334155;
+            border-radius: 4px; margin-top: 20px; overflow: hidden;
+            display: none;
+        }
+        #progress-fill { width: 0%; height: 100%; background: var(--primary); }
+    </style>
+</head>
+<body>
 
+<div class="container">
+    <header>
+        <h1 style="font-size: 2.5rem; color: var(--primary);">Magic Mod Converter</h1>
+        <p>Java版Modを、統合版Addonへ。魔法のような変換体験を。</p>
+    </header>
+
+    <div class="hero-card">
+        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+            <p>クリックして .jar ファイルをアップロード</p>
+            <input type="file" id="fileInput" hidden>
+        </div>
+        <button id="convertBtn">変換エンジンを起動</button>
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+    </div>
+
+    <div class="grid">
+        <div class="feature-card">
+            <h3>🌐 高速解析</h3>
+            <p>Jarの中身を瞬時に解剖し、必要なリソースを抽出します。</p>
+        </div>
+        <div class="feature-card">
+            <h3>✨ AI翻訳</h3>
+            <p>複雑なJavaコードを、統合版のスクリプトへと橋渡しします。</p>
+        </div>
+        <div class="feature-card">
+            <h3>🛡️ 安全検証</h3>
+            <p>変換エラーをリアルタイムで検知し、修正ガイドを表示します。</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
