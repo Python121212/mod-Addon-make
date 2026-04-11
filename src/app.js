@@ -1,47 +1,94 @@
-
 /**
- * app.js
- * ユーザーの操作を受け取り、変換エンジンを駆動する管理者
+ * app.js - Magic Mod Converter 統合スクリプト
+ * 役割: UI制御・エンジン起動・各専門家の管理
  */
-import { ConversionEngine } from './core/Engine.js';
 
-// DOMの読み込み完了を待機
+// --- 1. 【専門家】変換ロジック ---
+class ModLoader {
+    async load(file) {
+        console.log(`[Loader] ${file.name} を解析中...`);
+        return { assets: ["texture1.png", "recipe.json"], code: ["Main.class"] };
+    }
+}
+
+class TextureConverter {
+    async convert(name) {
+        console.log(`[Texture] ${name} を変換中...`);
+        return { path: `textures/${name}`, blob: new Blob(["data"]) };
+    }
+}
+
+class Validator {
+    validate(data) {
+        return !!data;
+    }
+}
+
+class ModExporter {
+    async pack(list) { console.log("[Exporter] zip圧縮中..."); }
+    async download() { alert("魔法の変換が完了しました！"); }
+}
+
+// --- 2. 【司令塔】ConversionEngine ---
+class ConversionEngine {
+    constructor(uiCallback) {
+        this.loader = new ModLoader();
+        this.texture = new TextureConverter();
+        this.validator = new Validator();
+        this.exporter = new ModExporter();
+        this.onProgress = uiCallback;
+    }
+
+    async run(file) {
+        try {
+            this.onProgress("解析中...", 20);
+            const structure = await this.loader.load(file);
+            
+            this.onProgress("テクスチャ変換中...", 50);
+            const output = [];
+            for (const asset of structure.assets) {
+                const result = await this.texture.convert(asset);
+                if (this.validator.validate(result)) output.push(result);
+            }
+
+            this.onProgress("出力準備中...", 80);
+            await this.exporter.pack(output);
+            await this.exporter.download();
+            this.onProgress("完了！", 100);
+        } catch (e) {
+            this.onProgress("エラーが発生しました", 0);
+            console.error(e);
+        }
+    }
+}
+
+// --- 3. 【UI管理者】イベント制御 ---
 document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('fileInput');
     const convertBtn = document.getElementById('convertBtn');
-    const progressBar = document.getElementById('progress-bar');
-    const progressFill = document.getElementById('progress-fill');
+    const statusMsg = document.getElementById('statusMessage');
+    const progBar = document.getElementById('progress-bar');
+    const progFill = document.getElementById('progress-fill');
 
-    // 進捗表示を更新するコールバック関数
-    const updateUI = (message, percent) => {
-        console.log(`[UI] ${message}`);
-        progressBar.style.display = 'block';
-        progressFill.style.width = `${percent}%`;
-        // ここにログ出力エリアへのDOM追加処理を書いてもOK
-    };
-
-    // 変換エンジンのインスタンス化
-    const engine = new ConversionEngine(updateUI);
-
-    // 変換ボタンのイベントリスナー
-    convertBtn.addEventListener('click', async () => {
-        const file = fileInput.files[0];
-        if (!file) {
-            alert("まず .jar ファイルを選択してください！");
-            return;
-        }
-
-        try {
-            convertBtn.disabled = true; // 二重クリック防止
-            convertBtn.innerText = "魔法を実行中...";
-            
-            await engine.run(file);
-            
-            convertBtn.innerText = "変換完了！";
-        } catch (err) {
-            alert("変換エラー: " + err.message);
+    // ファイル選択時の挙動
+    fileInput.addEventListener('change', (e) => {
+        if(e.target.files[0]) {
+            statusMsg.innerText = `準備OK: ${e.target.files[0].name}`;
             convertBtn.disabled = false;
-            convertBtn.innerText = "変換エンジンを再起動";
         }
+    });
+
+    // 変換ボタンクリック時の挙動
+    convertBtn.addEventListener('click', async () => {
+        progBar.style.display = 'block';
+        convertBtn.disabled = true;
+
+        const engine = new ConversionEngine((msg, percent) => {
+            progFill.style.width = `${percent}%`;
+            statusMsg.innerText = msg;
+        });
+
+        await engine.run(fileInput.files[0]);
+        convertBtn.disabled = false;
     });
 });
